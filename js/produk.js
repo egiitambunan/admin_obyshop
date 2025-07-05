@@ -2,7 +2,7 @@
 const API = "https://obyshop-backend-production-4831.up.railway.app/api/products";
 const token = localStorage.getItem("token");
 
-if (!token) location.href = "login.html";
+if (!token) location.href = "index.html";
 
 const headers = {
   "Content-Type": "application/json",
@@ -14,6 +14,11 @@ const form = document.getElementById("productForm");
 
 async function loadProducts() {
   const res = await fetch(API);
+  if (!res.ok) {
+  alert("Gagal memuat produk. Silakan login ulang.");
+  location.href = "index.html";
+  return;
+}
   const data = await res.json();
 
   tableBody.innerHTML = "";

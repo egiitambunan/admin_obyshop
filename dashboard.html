@@ -41,9 +41,14 @@
   </div>
 
   <script>
+     // Cek apakah user sudah login
+  const token = localStorage.getItem("token");
+  if (!token) {
+    location.href = "index.html";
+  }
     function logout() {
       localStorage.removeItem("token");
-      location.href = "login.html";
+      location.href = "index.html";
     }
 
     async function loadSummary() {
@@ -58,7 +63,12 @@
         console.error("Gagal mengambil data ringkasan", err);
       }
     }
-
+    if (!produkRes.ok) {
+  alert("Sesi login habis, silakan login ulang.");
+  localStorage.removeItem("token");
+  location.href = "index.html";
+  return;
+}
     loadSummary();
   </script>
 </body>

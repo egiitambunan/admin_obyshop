@@ -17,6 +17,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     localStorage.setItem("token", data.token);
     window.location.href = "dashboard.html";
   } else {
-    alert(data.message || "Login gagal");
+    document.getElementById("errorMsg").innerText = data.message || "Login gagal";
   }
 });

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Konten | ObyShop Admin</title>
+  <link rel="stylesheet" href="css/admin-style.css">
+</head>
+<body class="dashboard">
+  <div class="sidebar">
+    <h2>ObyShop Admin</h2>
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="produk.html">Kelola Produk</a></li>
+      <li><a href="konten.html" class="active">Kelola Konten</a></li>
+      <li><a href="#" onclick="logout()">Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <h1>Edit Konten Website</h1>
+    <form id="kontenForm">
+      <h3>Hero Section</h3>
+      <input type="text" id="heroTitle" placeholder="Judul Hero" required />
+      <input type="text" id="heroSubtitle" placeholder="Subjudul Hero" required />
+      <label>Warna Judul</label>
+      <input type="color" id="heroTitleColor" />
+      <label>Warna Subjudul</label>
+      <input type="color" id="heroSubtitleColor" />
+
+      <label>Background Hero</label>
+      <input type="file" id="heroBackgroundUpload" />
+      <img id="heroPreview" style="max-height: 120px; margin-top: 10px;" />
+      <input type="text" id="heroBackgroundImage" readonly />
+
+      <h3>Tentang Kami</h3>
+      <!-- ✅ Tambahkan ini agar sesuai dengan konten.js -->
+      <label>Isi Tentang Kami</label>
+      <textarea id="aboutText" placeholder="Deskripsi tentang kami..."></textarea>
+
+      <!-- Video 1 -->
+      <label>Deskripsi Video 1</label>
+      <textarea id="aboutVideoDesc1" placeholder="Deskripsi singkat..."></textarea>
+
+      <label>URL Video 1</label>
+      <input type="text" id="aboutVideoUrl1" placeholder="https://... atau /uploads/video1.mp4" />
+
+      <label>Upload Video 1</label>
+      <input type="file" id="aboutVideoUpload1" accept="video/*" />
+      <video id="aboutVideoPreview1" controls style="max-width: 200px; margin-top: 10px;"></video>
+
+      <hr />
+
+      <!-- Video 2 -->
+      <label>Deskripsi Video 2</label>
+      <textarea id="aboutVideoDesc2" placeholder="Deskripsi singkat..."></textarea>
+
+      <label>URL Video 2</label>
+      <input type="text" id="aboutVideoUrl2" placeholder="https://... atau /uploads/video2.mp4" />
+
+      <label>Upload Video 2</label>
+      <input type="file" id="aboutVideoUpload2" accept="video/*" />
+      <video id="aboutVideoPreview2" controls style="max-width: 200px; margin-top: 10px;"></video>
+
+      <hr />
+
+      <!-- Video 3 -->
+      <label>Deskripsi Video 3</label>
+      <textarea id="aboutVideoDesc3" placeholder="Deskripsi singkat..."></textarea>
+
+      <label>URL Video 3</label>
+      <input type="text" id="aboutVideoUrl3" placeholder="https://... atau /uploads/video3.mp4" />
+
+      <label>Upload Video 3</label>
+      <input type="file" id="aboutVideoUpload3" accept="video/*" />
+      <video id="aboutVideoPreview3" controls style="max-width: 200px; margin-top: 10px;"></video>
+
+      <h3>Kontak</h3>
+      <input type="text" id="contactPhone" placeholder="Nomor Telepon / WA" required />
+      <input type="email" id="contactEmail" placeholder="Email Kontak" required />
+      <input type="text" id="contactAddress" placeholder="Alamat" required />
+
+      <h3>Link Media Sosial</h3>
+      <input type="url" id="instagramLink" placeholder="Link Instagram" />
+      <input type="url" id="facebookLink" placeholder="Link Facebook" />
+      <input type="url" id="tiktokLink" placeholder="Link TikTok" />
+
+      <h3>WhatsApp</h3>
+      <input type="text" id="waContact" placeholder="Nomor untuk Tombol Kontak" />
+      <input type="text" id="waBubble" placeholder="Nomor untuk Gelembung WhatsApp" />
+
+      <h3>Tema</h3>
+      <label>Warna Utama</label>
+      <input type="color" id="primaryColor" />
+      <label>Warna Latar</label>
+      <input type="color" id="backgroundColor" />
+
+      <button type="submit">Simpan Perubahan</button>
+    </form>
+  </div>
+
+  <script src="js/konten.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

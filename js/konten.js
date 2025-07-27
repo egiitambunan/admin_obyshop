@@ -161,5 +161,45 @@ videoInputs.forEach((v, index) => {
     }
   });
 });
+// === Upload hero background image ===
+const heroImageInput = document.getElementById("heroBackgroundImageUpload");
 
+heroImageInput?.addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+  if (!validTypes.includes(file.type)) {
+    alert("❌ Format gambar tidak didukung.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("slot", "heroBackground"); // bebas, backend tangani slot ini
+
+  try {
+    const res = await fetch("https://obyshop-backend-production-4831.up.railway.app/api/upload/image", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      }
+    });
+
+    const data = await res.json();
+
+    if (data.imageUrl) {
+      const input = document.getElementById("heroBackgroundImage");
+      const preview = document.getElementById("heroPreview");
+      if (input) input.value = data.imageUrl;
+      if (preview) preview.src = `https://obyshop-backend-production-4831.up.railway.app${data.imageUrl}`;
+    } else {
+      alert("Gagal upload gambar: " + (data.error || "Tidak diketahui"));
+    }
+  } catch (err) {
+    console.error("❌ Upload gagal:", err);
+    alert("Upload gambar gagal. Periksa koneksi atau server.");
+  }
+});
 loadKonten();

@@ -29,10 +29,6 @@
           <p id="total-produk" style="font-size: 32px; font-weight: bold; color: #b6895b;">0</p>
         </div>
         <div style="flex: 1; min-width: 220px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-          <h3>Kategori</h3>
-          <p id="total-kategori" style="font-size: 32px; font-weight: bold; color: #b6895b;">0</p>
-        </div>
-        <div style="flex: 1; min-width: 220px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
           <h3>Konten Aktif</h3>
           <p style="font-size: 32px; font-weight: bold; color: #b6895b;">✓</p>
         </div>
@@ -41,34 +37,22 @@
   </div>
 
   <script>
-     // Cek apakah user sudah login
-  const token = localStorage.getItem("token");
-  if (!token) {
-    location.href = "index.html";
-  }
     function logout() {
       localStorage.removeItem("token");
-      location.href = "index.html";
+      location.href = "login.html";
     }
 
     async function loadSummary() {
       try {
-        const produkRes = await fetch("https://obyshop-backend-production-4831.up.railway.app/api/products");
+        const produkRes = await fetch("http://localhost:5000/api/products");
         const produkData = await produkRes.json();
         document.getElementById("total-produk").textContent = produkData.length;
 
-        const kategori = [...new Set(produkData.map(p => p.kategori))];
-        document.getElementById("total-kategori").textContent = kategori.length;
       } catch (err) {
         console.error("Gagal mengambil data ringkasan", err);
       }
     }
-    if (!produkRes.ok) {
-  alert("Sesi login habis, silakan login ulang.");
-  localStorage.removeItem("token");
-  location.href = "index.html";
-  return;
-}
+
     loadSummary();
   </script>
 </body>

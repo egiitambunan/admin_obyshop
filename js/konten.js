@@ -1,62 +1,106 @@
-const form = document.getElementById("kontenForm");
+document.addEventListener("DOMContentLoaded", async () => {
+  const form = document.getElementById("kontenForm");
+  if (!form) return;
 
-// Ambil konten dari backend lalu tampilkan ke form
-async function loadKonten() {
-  const res = await fetch("https://obyshop-backend-production-4831.up.railway.app/api/content", {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-  });
+  const base = "http://localhost:5000";
+  const isAbsolute = (u) => /^https?:\/\//i.test(u);
 
-  if (!res.ok) {
-    alert("Gagal mengambil data: " + res.statusText);
-    return;
+  try {
+    const res = await fetch(`${base}/api/content`);
+    const data = await res.json();
+
+    const setField = (name, value) => {
+      if (!name) return;
+      const el = form.elements[name];
+      if (el) el.value = value ?? "";
+    };
+
+    // Hero
+    setField("heroTitle", data.heroTitle || "");
+    setField("heroSubtitle", data.heroSubtitle || "");
+    setField("heroTitleColor", data.heroTitleColor || "#000000");
+    setField("heroSubtitleColor", data.heroSubtitleColor || "#000000");
+    setField("heroBackgroundImage", data.heroBackgroundImage || "");
+    if (data.heroBackgroundImage) {
+      const preview = document.getElementById("heroPreview");
+      if (preview) {
+        const imgPath = data.heroBackgroundImage.startsWith("/")
+          ? `${base}${data.heroBackgroundImage}`
+          : (isAbsolute(data.heroBackgroundImage) ? data.heroBackgroundImage : `${base}${data.heroBackgroundImage}`);
+        preview.src = imgPath;
+      }
+    }
+
+    // Kontak
+    setField("contactPhone", data.contactInfo?.phone || "");
+    setField("contactEmail", data.contactInfo?.email || "");
+    setField("contactAddress", data.contactInfo?.address || "");
+
+    // Sosial Media
+    setField("instagramLink", data.socialMedia?.instagram || "");
+    setField("facebookLink", data.socialMedia?.facebook || "");
+    setField("tiktokLink", data.socialMedia?.tiktok || "");
+
+    // WhatsApp
+    setField("waContact", data.whatsapp?.contactButton || "");
+    setField("waBubble", data.whatsapp?.bubbleButton || "");
+
+    // Tema Warna
+    setField("primaryColor", data.theme?.primaryColor || "#000000");
+    setField("backgroundColor", data.theme?.backgroundColor || "#ffffff");
+  } catch (err) {
+    console.error("Gagal memuat konten:", err);
+    alert("Gagal memuat data konten dari server.");
   }
+});
 
-  const data = await res.json();
+// ================= Fungsi Upload Gambar =================
+async function handleFileUpload(inputEl, urlInputEl, previewEl) {
+  if (!inputEl) return;
+  const file = inputEl.files?.[0];
+  if (!file) return;
 
-  // Hero
-  if (form.heroTitle) form.heroTitle.value = data.heroTitle || "";
-  if (form.heroSubtitle) form.heroSubtitle.value = data.heroSubtitle || "";
-  if (form.heroTitleColor) form.heroTitleColor.value = data.heroTitleColor || "#000000";
-  if (form.heroSubtitleColor) form.heroSubtitleColor.value = data.heroSubtitleColor || "#000000";
-  if (form.heroBackgroundImage) form.heroBackgroundImage.value = data.heroBackgroundImage || "";
-  if (data.heroBackgroundImage) {
-    const heroPreview = document.getElementById("heroPreview");
-    if (heroPreview) heroPreview.src = `https://obyshop-backend-production-4831.up.railway.app${data.heroBackgroundImage}`;
-  }
+  const base = "http://localhost:5000";
+  const formData = new FormData();
+  const isHero = inputEl.name === "heroBackgroundUpload";
 
-  // Tentang Kami
-  if (form.aboutText) form.aboutText.value = data.aboutText || "";
+  formData.append("gambar", file);
 
-  // Video
-  if (Array.isArray(data.aboutVideos)) {
-    const v = data.aboutVideos;
+  const endpoint = "/api/upload/hero";
 
-    if (v[0]) {
-      if (form.aboutVideoUrl1) form.aboutVideoUrl1.value = v[0].videoUrl || "";
-      if (form.aboutVideoDesc1) form.aboutVideoDesc1.value = v[0].desc || "";
-      const prev1 = document.getElementById("aboutVideoPreview1");
-      if (prev1) prev1.src = v[0].videoUrl ? `https://obyshop-backend-production-4831.up.railway.app${v[0].videoUrl}` : "";
+  try {
+    const res = await fetch(`${base}${endpoint}`, {
+      method: "POST",
+      body: formData,
+    });
+    const result = await res.json();
+
+    if (isHero && result.imageUrl) {
+      const serverUrl = result.imageUrl;
+      if (urlInputEl) urlInputEl.value = serverUrl;
+      const final = /^https?:\/\//i.test(serverUrl) ? serverUrl : (serverUrl.startsWith("/") ? `${base}${serverUrl}` : `${base}${serverUrl}`);
+      if (previewEl) previewEl.src = final;
     }
-    if (v[1]) {
-      if (form.aboutVideoUrl2) form.aboutVideoUrl2.value = v[1].videoUrl || "";
-      if (form.aboutVideoDesc2) form.aboutVideoDesc2.value = v[1].desc || "";
-      const prev2 = document.getElementById("aboutVideoPreview2");
-      if (prev2) prev2.src = v[1].videoUrl ? `https://obyshop-backend-production-4831.up.railway.app${v[1].videoUrl}` : "";
-    }
-    if (v[2]) {
-      if (form.aboutVideoUrl3) form.aboutVideoUrl3.value = v[2].videoUrl || "";
-      if (form.aboutVideoDesc3) form.aboutVideoDesc3.value = v[2].desc || "";
-      const prev3 = document.getElementById("aboutVideoPreview3");
-      if (prev3) prev3.src = v[2].videoUrl ? `https://obyshop-backend-production-4831.up.railway.app${v[2].videoUrl}` : "";
-    }
+  } catch (err) {
+    console.error("Upload gagal:", err);
+    alert("Gagal mengunggah file.");
   }
 }
 
-// Kirim data ke backend
-form.addEventListener("submit", async (e) => {
+// Event upload hero
+document.getElementById("heroBackgroundUpload")?.addEventListener("change", () => {
+  handleFileUpload(
+    document.getElementById("heroBackgroundUpload"),
+    document.getElementById("heroBackgroundImage"),
+    document.getElementById("heroPreview")
+  );
+});
+
+// ================= Submit Form =================
+document.getElementById("kontenForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const form = e.target;
+  const base = "http://localhost:5000";
 
   const body = {
     heroTitle: form.heroTitle?.value || "",
@@ -64,25 +108,14 @@ form.addEventListener("submit", async (e) => {
     heroTitleColor: form.heroTitleColor?.value || "#000000",
     heroSubtitleColor: form.heroSubtitleColor?.value || "#000000",
     heroBackgroundImage: form.heroBackgroundImage?.value || "",
-    aboutText: form.aboutText?.value || "",
 
-    aboutVideo1: form.aboutVideoUrl1?.value || "",
-    aboutVideo2: form.aboutVideoUrl2?.value || "",
-    aboutVideo3: form.aboutVideoUrl3?.value || "",
-
-    aboutVideo1Desc: form.aboutVideoDesc1?.value || "",
-    aboutVideo2Desc: form.aboutVideoDesc2?.value || "",
-    aboutVideo3Desc: form.aboutVideoDesc3?.value || "",
+    aboutText: "", // opsional
+    aboutVideos: [], // kosongkan karena video dihapus
 
     contactInfo: {
       phone: form.contactPhone?.value || "",
       email: form.contactEmail?.value || "",
       address: form.contactAddress?.value || "",
-    },
-
-    whatsapp: {
-      contactButton: form.waContact?.value || "",
-      bubbleButton: form.waBubble?.value || "",
     },
 
     socialMedia: {
@@ -91,115 +124,37 @@ form.addEventListener("submit", async (e) => {
       tiktok: form.tiktokLink?.value || "",
     },
 
+    whatsapp: {
+      contactButton: form.waContact?.value || "",
+      bubbleButton: form.waBubble?.value || "",
+    },
+
     theme: {
       primaryColor: form.primaryColor?.value || "#000000",
       backgroundColor: form.backgroundColor?.value || "#ffffff",
     },
   };
 
-  const res = await fetch("https://obyshop-backend-production-4831.up.railway.app/api/content", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (res.ok) {
-    alert("Konten berhasil diperbarui!");
-    loadKonten();
-  } else {
-    alert("Gagal menyimpan konten");
-  }
-});
-
-// === Upload video ===
-const videoInputs = [
-  { file: 'aboutVideoUpload1', url: 'aboutVideoUrl1', preview: 'aboutVideoPreview1' },
-  { file: 'aboutVideoUpload2', url: 'aboutVideoUrl2', preview: 'aboutVideoPreview2' },
-  { file: 'aboutVideoUpload3', url: 'aboutVideoUrl3', preview: 'aboutVideoPreview3' }
-];
-
-videoInputs.forEach((v, index) => {
-  document.getElementById(v.file)?.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const validTypes = ["video/mp4", "video/webm", "video/ogg", "video/3gpp", "video/quicktime"];
-    if (!validTypes.includes(file.type)) {
-      alert("❌ Format video tidak didukung.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("video", file);
-    formData.append("slot", `video${index + 1}`);
-
-    try {
-      const res = await fetch("https://obyshop-backend-production-4831.up.railway.app/api/upload/video", {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        }
-      });
-
-      const data = await res.json();
-
-      if (data.videoUrl) {
-        const inputUrl = document.getElementById(v.url);
-        const preview = document.getElementById(v.preview);
-        if (inputUrl) inputUrl.value = data.videoUrl;
-        if (preview) preview.src = `https://obyshop-backend-production-4831.up.railway.app${data.videoUrl}`;
-      } else {
-        alert("Gagal upload: " + (data.error || "Tidak diketahui"));
-      }
-    } catch (err) {
-      console.error("❌ Upload gagal:", err);
-      alert("Upload gagal. Periksa koneksi atau server.");
-    }
-  });
-});
-// === Upload hero background image ===
-const heroImageInput = document.getElementById("heroBackgroundImageUpload");
-
-heroImageInput?.addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-  if (!validTypes.includes(file.type)) {
-    alert("❌ Format gambar tidak didukung.");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("image", file);
-  formData.append("slot", "heroBackground"); // bebas, backend tangani slot ini
-
   try {
-    const res = await fetch("https://obyshop-backend-production-4831.up.railway.app/api/upload/image", {
-      method: "POST",
-      body: formData,
+    const token = localStorage.getItem("token") ?? "";
+    const res = await fetch(`${base}/api/content`, {
+      method: "PUT",
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      }
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
     });
 
-    const data = await res.json();
-
-    if (data.imageUrl) {
-      const input = document.getElementById("heroBackgroundImage");
-      const preview = document.getElementById("heroPreview");
-      if (input) input.value = data.imageUrl;
-      if (preview) preview.src = `https://obyshop-backend-production-4831.up.railway.app${data.imageUrl}`;
+    if (res.ok) {
+      alert("✅ Konten berhasil disimpan!");
     } else {
-      alert("Gagal upload gambar: " + (data.error || "Tidak diketahui"));
+      const txt = await res.text();
+      console.error("Response error:", res.status, txt);
+      alert("❌ Gagal menyimpan konten.");
     }
   } catch (err) {
-    console.error("❌ Upload gagal:", err);
-    alert("Upload gambar gagal. Periksa koneksi atau server.");
+    console.error("Gagal submit:", err);
+    alert("Terjadi kesalahan saat menyimpan.");
   }
 });
-loadKonten();

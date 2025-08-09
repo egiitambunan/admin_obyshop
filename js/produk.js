@@ -1,8 +1,7 @@
-// obyshop-admin-dashboard/js/produk.js
-const API = "https://obyshop-backend-production-4831.up.railway.app/api/products";
+const API = "http://localhost:5000/api/products";
 const token = localStorage.getItem("token");
 
-if (!token) location.href = "index.html";
+if (!token) location.href = "login.html";
 
 const headers = {
   "Content-Type": "application/json",
@@ -11,24 +10,29 @@ const headers = {
 
 const tableBody = document.querySelector("#productTable tbody");
 const form = document.getElementById("productForm");
+const searchInput = document.getElementById("searchInput"); // Tambahkan input pencarian
 
-async function loadProducts() {
-  const res = await fetch(API);
-  if (!res.ok) {
-  alert("Gagal memuat produk. Silakan login ulang.");
-  location.href = "index.html";
-  return;
-}
-  const data = await res.json();
+async function loadProducts(query = "") {
+  const url = query ? `${API}?q=${encodeURIComponent(query)}` : API;
+  const res = await fetch(url);
+  const result = await res.json();
 
   tableBody.innerHTML = "";
-  data.forEach((p) => {
+
+  // Pastikan sesuai format response baru
+  const products = Array.isArray(result) ? result : result.data || [];
+
+  if (products.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="7">Tidak ada produk ditemukan.</td></tr>`;
+    return;
+  }
+
+  products.forEach((p) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${p.nama}</td>
       <td>${p.harga}</td>
-      <td>${p.kategori}</td>
-      <td><img src="https://obyshop-backend-production-4831.up.railway.app/uploads/products/${p.imageFilename}" width="60" /></td>
+      <td><img src="http://localhost:5000/uploads/products/${p.imageFilename}" width="60" /></td>
       <td>${p.deskripsi || "-"}</td>
       <td>${p.produkBaru ? "✅" : "❌"}</td>
       <td>${p.produkUtama ? "✅" : "❌"}</td>
@@ -44,10 +48,10 @@ async function loadProducts() {
 async function editProduct(id) {
   const res = await fetch(`${API}/${id}`);
   const p = await res.json();
+
   document.getElementById("productId").value = p._id;
   document.getElementById("nama").value = p.nama;
   document.getElementById("harga").value = p.harga;
-  document.getElementById("kategori").value = p.kategori;
   document.getElementById("gambar").value = p.gambar;
   document.getElementById("deskripsi").value = p.deskripsi || "";
   document.getElementById("produkUtama").checked = p.produkUtama || false;
@@ -60,7 +64,7 @@ async function deleteProduct(id) {
       method: "DELETE",
       headers
     });
-    loadProducts();
+    loadProducts(searchInput.value); // Refresh berdasarkan hasil pencarian aktif
   }
 }
 
@@ -70,7 +74,6 @@ form.addEventListener("submit", async (e) => {
   const data = {
     nama: form.nama.value,
     harga: form.harga.value,
-    kategori: form.kategori.value,
     gambar: form.gambar.value,
     deskripsi: form.deskripsi.value,
     produkUtama: document.getElementById("produkUtama").checked,
@@ -88,7 +91,15 @@ form.addEventListener("submit", async (e) => {
   });
 
   form.reset();
-  loadProducts();
+  loadProducts(searchInput.value);
 });
 
+// Fitur pencarian
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    loadProducts(searchInput.value);
+  });
+}
+
+// Inisialisasi
 loadProducts();

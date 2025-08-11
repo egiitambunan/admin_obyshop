@@ -44,7 +44,7 @@
 
     async function loadSummary() {
       try {
-        const produkRes = await fetch("http://localhost:5000/api/products");
+        const produkRes = await fetch("https://backend-obyshop-production.up.railway.app/api/products");
         const produkData = await produkRes.json();
         document.getElementById("total-produk").textContent = produkData.length;
 
@@ -57,3 +57,4 @@
   </script>
 </body>
 </html>
+

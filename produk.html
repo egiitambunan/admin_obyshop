@@ -69,7 +69,7 @@
       formData.append("produkUtama", form.produkUtama.checked);
 
       try {
-        const res = await fetch("http://localhost:5000/api/products", {
+        const res = await fetch("https://backend-obyshop-production.up.railway.app/api/products", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`
@@ -93,7 +93,7 @@
     });
 
     async function loadProduk(q = "") {
-      const url = q ? `http://localhost:5000/api/products?q=${encodeURIComponent(q)}` : "http://localhost:5000/api/products";
+      const url = q ? `https://backend-obyshop-production.up.railway.app/api/products?q=${encodeURIComponent(q)}` : "https://backend-obyshop-production.up.railway.app/api/products";
       const res = await fetch(url);
       const data = await res.json();
       list.innerHTML = "";
@@ -114,7 +114,7 @@
               <small>${p.produkBaru ? "🆕 Produk Baru" : ""} ${p.produkUtama ? "⭐ Produk Utama" : ""}</small>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-              <img src="http://localhost:5000/uploads/products/${p.imageFilename}" alt="${p.nama}" style="height: 50px; border-radius: 5px;" />
+              <img src="https://backend-obyshop-production.up.railway.app/uploads/products/${p.imageFilename}" alt="${p.nama}" style="height: 50px; border-radius: 5px;" />
               <button onclick="hapusProduk('${p._id}')" style="background:#e74c3c; color:#fff; border:none; padding:6px 10px; border-radius:5px; cursor:pointer;">Hapus</button>
             </div>
           </div>
@@ -127,7 +127,7 @@
       if (!confirm("Yakin ingin menghapus produk ini?")) return;
 
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        const res = await fetch(`https://backend-obyshop-production.up.railway.app/api/products/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`
@@ -160,3 +160,4 @@
   </script>
 </body>
 </html>
+

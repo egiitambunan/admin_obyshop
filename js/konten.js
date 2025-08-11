@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("kontenForm");
   if (!form) return;
 
-  const base = "http://localhost:5000";
+  const base = "https://backend-obyshop-production.up.railway.app";
   const isAbsolute = (u) => /^https?:\/\//i.test(u);
 
   try {
@@ -60,7 +60,7 @@ async function handleFileUpload(inputEl, urlInputEl, previewEl) {
   const file = inputEl.files?.[0];
   if (!file) return;
 
-  const base = "http://localhost:5000";
+  const base = "https://backend-obyshop-production.up.railway.app";
   const formData = new FormData();
   const isHero = inputEl.name === "heroBackgroundUpload";
 
@@ -100,7 +100,7 @@ document.getElementById("heroBackgroundUpload")?.addEventListener("change", () =
 document.getElementById("kontenForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
-  const base = "http://localhost:5000";
+  const base = "https://backend-obyshop-production.up.railway.app";
 
   const body = {
     heroTitle: form.heroTitle?.value || "",
@@ -158,3 +158,4 @@ document.getElementById("kontenForm")?.addEventListener("submit", async (e) => {
     alert("Terjadi kesalahan saat menyimpan.");
   }
 });
+

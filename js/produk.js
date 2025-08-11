@@ -1,4 +1,4 @@
-const API = "http://localhost:5000/api/products";
+const API = "https://backend-obyshop-production.up.railway.app/api/products";
 const token = localStorage.getItem("token");
 
 if (!token) location.href = "login.html";
@@ -32,7 +32,7 @@ async function loadProducts(query = "") {
     row.innerHTML = `
       <td>${p.nama}</td>
       <td>${p.harga}</td>
-      <td><img src="http://localhost:5000/uploads/products/${p.imageFilename}" width="60" /></td>
+      <td><img src="https://backend-obyshop-production.up.railway.app/uploads/products/${p.imageFilename}" width="60" /></td>
       <td>${p.deskripsi || "-"}</td>
       <td>${p.produkBaru ? "✅" : "❌"}</td>
       <td>${p.produkUtama ? "✅" : "❌"}</td>
@@ -103,3 +103,4 @@ if (searchInput) {
 
 // Inisialisasi
 loadProducts();
+
